@@ -43,21 +43,14 @@ app.use(notFound);
 app.use(errorHandler);
 
 /*--------------------- Boot ---------------------*/
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, '0.0.0.0', () => console.log(`API running on ${PORT}`));
+await connectDB();
 
-const start = async () => {
-  try {
-    await connectDB();
-    app.listen(PORT, () =>
-      console.log(`EduTrack SMS API running on http://localhost:${PORT}`)
-    );
-  } catch (err) {
-    console.error("Failed to start server:", err.message);
-    process.exit(1);
-  }
-};
-
-start();
+// Vercel serverless එකේ listen කරන්නේ නෑ — local development එකට විතරයි
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 8000;
+  app.listen(PORT, () =>
+    console.log(`EduTrack SMS API running on http://localhost:${PORT}`)
+  );
+}
 
 export default app;

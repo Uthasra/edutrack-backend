@@ -1,10 +1,24 @@
 import mongoose from "mongoose";
 
-/* Connect to MongoDB. Throws on failure so server.js can exit cleanly. */
+let cached = global._mongoose;
+if (!cached) {
+  cached = global._mongoose = { conn: null, promise: null };
+}
+
 export const connectDB = async () => {
-  const uri = process.env.MONGO_URI || "mongodb://localhost:27017/edutrack";
-  mongoose.set("strictQuery", true);
-  const conn = await mongoose.connect(uri);
-  console.log(`MongoDB connected: ${conn.connection.host}/${conn.connection.name}`);
-  return conn;
+  if (cached.conn) return cached.conn;
+
+  if (!cached.promise) {
+    cached.promise = mongoose
+      .connect(process.env.MONGO_URI, { bufferCommands: false })
+      .then((m) => {
+        console.log(`MongoDB connected: ${m.connection.host}/${m.connection.name}`);
+        return m;
+      });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
 };
+
+export default connectDB;
