@@ -17,12 +17,10 @@ import analyticsRoutes from "./routes/analytics.routes.js";
 const app = express();
 
 /*--------------------- Middleware ---------------------*/
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: [process.env.CLIENT_URL, 'http://localhost:5173'],
+  credentials: true
+}));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV !== "production") app.use(morgan("dev"));
@@ -46,6 +44,7 @@ app.use(errorHandler);
 
 /*--------------------- Boot ---------------------*/
 const PORT = process.env.PORT || 8000;
+app.listen(PORT, '0.0.0.0', () => console.log(`API running on ${PORT}`));
 
 const start = async () => {
   try {
